@@ -72,6 +72,20 @@ export function loadRazorpayCheckoutScript(): Promise<boolean> {
   });
 }
 
+async function safeParseJsonResponse<T>(res: Response, fallbackError: string): Promise<T> {
+  const rawText = await res.text();
+  if (!rawText) {
+    throw new Error(`${fallbackError} (HTTP ${res.status})`);
+  }
+  try {
+    return JSON.parse(rawText) as T;
+  } catch {
+    throw new Error(
+      `Payment server returned an unexpected response (HTTP ${res.status}). Check that API routes and Razorpay environment variables are configured.`
+    );
+  }
+}
+
 /**
  * Create a live ₹299 Razorpay Order on the backend.
  */
@@ -85,11 +99,14 @@ export async function createRazorpayOrder(
     body: JSON.stringify({ itemName, coupleName }),
   });
 
-  const data = await res.json();
+  const data = await safeParseJsonResponse<RazorpayOrderResponse & { error?: string }>(
+    res,
+    'Could not create Razorpay payment order.'
+  );
   if (!res.ok || !data.success) {
     throw new Error(data.error || 'Could not create Razorpay payment order.');
   }
-  return data as RazorpayOrderResponse;
+  return data;
 }
 
 /**
@@ -104,11 +121,14 @@ export async function verifyRazorpayPayment(
     body: JSON.stringify(payload),
   });
 
-  const data = await res.json();
+  const data = await safeParseJsonResponse<RazorpayVerifyResponse & { error?: string }>(
+    res,
+    'Razorpay payment verification failed.'
+  );
   if (!res.ok || !data.verified) {
     throw new Error(data.error || 'Razorpay payment verification failed.');
   }
-  return data as RazorpayVerifyResponse;
+  return data;
 }
 
 /**
@@ -123,11 +143,14 @@ export async function verifyRazorpayPaymentId(
     body: JSON.stringify({ paymentId }),
   });
 
-  const data = await res.json();
+  const data = await safeParseJsonResponse<RazorpayVerifyResponse & { error?: string }>(
+    res,
+    'Could not verify this Razorpay Payment ID.'
+  );
   if (!res.ok || !data.verified) {
     throw new Error(data.error || 'Could not verify this Razorpay Payment ID.');
   }
-  return data as RazorpayVerifyResponse;
+  return data;
 }
 
 /**
