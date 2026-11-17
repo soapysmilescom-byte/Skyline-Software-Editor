@@ -1,5 +1,54 @@
 import { GoogleGenAI } from '@google/genai';
-import { parseJsonBody, sendJson } from './_razorpay';
+
+function sendJson(res: any, statusCode: number, payload: unknown) {
+  res.setHeader('Content-Type', 'application/json');
+  res.statusCode = statusCode;
+  res.end(JSON.stringify(payload));
+}
+
+async function readBody(req: any): Promise<Record<string, any>> {
+  if (req?.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
+    return req.body;
+  }
+  if (typeof req?.body === 'string' && req.body.trim()) {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return {};
+    }
+  }
+  if (Buffer.isBuffer(req?.body)) {
+    try {
+      return JSON.parse(req.body.toString('utf8'));
+    } catch {
+      return {};
+    }
+  }
+
+  return new Promise((resolve) => {
+    const chunks: Buffer[] = [];
+    if (!req || typeof req.on !== 'function' || req.readableEnded) {
+      resolve({});
+      return;
+    }
+    req.on('data', (chunk: Buffer | string) => {
+      chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+    });
+    req.on('end', () => {
+      const raw = Buffer.concat(chunks).toString('utf8').trim();
+      if (!raw) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(raw));
+      } catch {
+        resolve({});
+      }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -7,7 +56,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const body = await parseJsonBody(req);
+    const body = await readBody(req);
     const {
       bridePhoto,
       groomPhoto,

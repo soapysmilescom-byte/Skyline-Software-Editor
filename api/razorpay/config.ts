@@ -1,16 +1,15 @@
-import {
-  getRazorpayCredentials,
-  sendJson,
-  STUDIO_PRICE_INR,
-  STUDIO_PRICE_PAISE,
-} from '../_razorpay';
-
 export default async function handler(_req: any, res: any) {
-  const { keyId, keySecret } = getRazorpayCredentials();
-  return sendJson(res, 200, {
-    configured: Boolean(keyId && keySecret),
-    priceInr: STUDIO_PRICE_INR,
-    amountPaise: STUDIO_PRICE_PAISE,
-    currency: 'INR',
-  });
+  const keyId = process.env.RAZORPAY_KEY_ID?.trim() || '';
+  const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim() || '';
+
+  res.setHeader('Content-Type', 'application/json');
+  res.statusCode = 200;
+  res.end(
+    JSON.stringify({
+      configured: Boolean(keyId && keySecret),
+      priceInr: 299,
+      amountPaise: 29900,
+      currency: 'INR',
+    })
+  );
 }

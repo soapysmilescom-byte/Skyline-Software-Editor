@@ -1,11 +1,15 @@
-import { getRazorpayCredentials, sendJson, STUDIO_PRICE_INR } from './_razorpay';
-
 export default async function handler(_req: any, res: any) {
-  const { keyId, keySecret } = getRazorpayCredentials();
-  return sendJson(res, 200, {
-    status: 'ok',
-    hasGeminiKey: Boolean(process.env.GEMINI_API_KEY),
-    hasRazorpay: Boolean(keyId && keySecret),
-    priceInr: STUDIO_PRICE_INR,
-  });
+  const keyId = process.env.RAZORPAY_KEY_ID?.trim() || '';
+  const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim() || '';
+
+  res.setHeader('Content-Type', 'application/json');
+  res.statusCode = 200;
+  res.end(
+    JSON.stringify({
+      status: 'ok',
+      hasGeminiKey: Boolean(process.env.GEMINI_API_KEY),
+      hasRazorpay: Boolean(keyId && keySecret),
+      priceInr: 299,
+    })
+  );
 }
