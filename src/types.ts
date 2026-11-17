@@ -1,0 +1,161 @@
+export interface CoupleData {
+  brideName: string;
+  groomName: string;
+  weddingDate: string; // YYYY-MM-DD
+  weddingTime: string; // HH:mm or text e.g. "5:00 PM onwards"
+  venue: string;
+  city: string;
+  ceremonyType: string; // "Wedding Ceremony", "Engagement Ceremony", etc.
+  parentsGroom: string;
+  parentsBride: string;
+  blessingHeader: string; // "|| Shree Ganeshay Namah ||" or "With Love & Joy"
+  coupleQuote: string;
+}
+
+export interface SceneItem {
+  id: number;
+  tag: string; // "scene1" | "scene2" | "scene3" | "scene4"
+  title: string;
+  subtitle: string;
+  actionText: string;
+  imageUrl: string;
+  duration: number; // in seconds
+  soundEffect?: string;
+  customOverlayText?: string;
+}
+
+export interface CaricatureAIProfile {
+  groom: {
+    features: string;
+    expression: string;
+  };
+  bride: {
+    features: string;
+    expression: string;
+  };
+  vibe: string;
+  romanticQuote?: string;
+  scenePrompts?: {
+    scene1?: string;
+    scene2?: string;
+    scene3?: string;
+    scene4?: string;
+  };
+}
+
+export interface SceneryOption {
+  id: string;
+  label: string;
+  category: 'proposal' | 'dance' | 'attire' | 'mandap' | 'scenery' | 'ritual' | 'upload';
+  imageUrl: string;
+  description: string;
+  themeName?: string;
+}
+
+export type AspectRatioType = '9:16' | '16:9';
+export type MusicTheme = 'romantic-waltz' | 'fairytale-ballad' | 'celestial-piano' | 'festive-sangeet';
+export type VideoQuality = '1080p' | '720p' | '4k';
+
+export interface ExportedVideoData {
+  blob: Blob;
+  url: string;
+  fileName: string;
+  mimeType: string;
+  extension: 'mp4' | 'webm';
+  quality: VideoQuality;
+  width: number;
+  height: number;
+  sizeBytes: number;
+  durationSeconds: number;
+  timestamp?: number;
+}
+
+export type WeddingThemeCategory = 'faith' | 'regional';
+
+export type ReligionThemeId =
+  | 'hindu'
+  | 'islam'
+  | 'christian'
+  | 'sikh'
+  | 'jewish'
+  | 'buddhist'
+  | 'jain'
+  | 'parsi'
+  | 'interfaith';
+
+export type RegionalThemeId =
+  | 'punjab'
+  | 'rajasthan'
+  | 'south'
+  | 'kerala'
+  | 'maharashtra'
+  | 'bengal'
+  | 'gujarat'
+  | 'kashmir'
+  | 'awadh'
+  | 'assam'
+  | 'beach'
+  | 'bollywood';
+
+export type WeddingThemeId = ReligionThemeId | RegionalThemeId;
+export type IndianStateId = WeddingThemeId;
+
+export interface IndianStateTheme {
+  id: WeddingThemeId;
+  name: string;
+  stateLabel: string;
+  region: string;
+  category?: WeddingThemeCategory; // 'faith' for Religions, 'regional' for Regional States
+  blessingHeader: string;
+  defaultVenue: string;
+  defaultCity: string;
+  ceremonyType: string;
+  musicTheme: MusicTheme;
+  brideAttire: string;
+  groomAttire: string;
+  culturalVibe: string;
+  officialCoupleImage: string;
+  accentColor: string;
+  cardBorderColor: string;
+  scenes: SceneItem[];
+  sceneryOptions: SceneryOption[];
+}
+
+export type WeddingTheme = IndianStateTheme;
+
+export interface SavedGalleryItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: 'all' | 'faith' | 'regional' | 'proposal' | 'dance' | 'attire' | 'mandap' | 'ritual' | 'upload' | 'card' | 'video';
+  mediaType: 'image' | 'video';
+  url: string;
+  themeName?: string;
+  description?: string;
+  dateAdded?: string;
+  aspectRatio?: AspectRatioType;
+  fileSize?: string;
+}
+
+export interface CustomAudioTrack {
+  id: string;
+  name: string;
+  dataUrl: string;
+  duration: number; // in seconds
+  fileSize?: string;
+  type?: string;
+}
+
+export interface PaymentDetails {
+  isUnlocked: boolean;
+  paymentId?: string;
+  orderId?: string;
+  verifiedGateway?: boolean;
+  receiptToken?: string;
+  unlockedAt?: string;
+  orderAmount?: string;
+  currency?: string;
+  screenshotUrl?: string; // Base64 data URL of uploaded proof of payment (fallback)
+  screenshotName?: string;
+  screenshotSize?: string;
+}
